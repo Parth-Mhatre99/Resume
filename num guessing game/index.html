@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="../portfolio/guess-logo.svg" type="image/svg+xml">
+    <meta name="theme-color" content="#111827">
+</head>
+<body>
+    <div class="game">
+        <div class="topbar">
+            <div class="brand">
+                <span class="logo-dot"></span>
+                <span class="brand-text">Guess</span>
+            </div>
+            <a class="topbar-link" href="../portfolio/index.html" aria-label="Back to Portfolio">Back to Portfolio</a>
+        </div>
+        <div class="header">
+            <h1>Number Guessing</h1>
+            <p class="subtitle">Guess a number between 1 and 100</p>
+        </div>
+        <div class="panel">
+            <input type="number" id="guess" min="1" max="100" placeholder="Enter guess" />
+            <button id="submit">Guess</button>
+            <button id="reset" class="secondary">Reset</button>
+        </div>
+        <div class="meter"><div id="meterFill"></div></div>
+        <div id="message" class="message">Start guessing...</div>
+        <div class="stats">
+            <div>Attempts: <span id="attempts">0</span></div>
+            <div>Best: <span id="best">–</span></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
