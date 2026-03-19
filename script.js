@@ -1,71 +1,66 @@
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+(() => {
+    const display = document.getElementById('display');
+    const keys = document.querySelector('.keys');
+    const clearBtn = document.getElementById('clear');
+    const equalsBtn = document.getElementById('equals');
+
+    let expression = '';
+
+    function updateDisplay() {
+        display.value = expression || '0';
+    }
+
+    function append(value) {
+        expression += value;
+        updateDisplay();
+    }
+
+    function appendOp(op) {
+        if (expression === '' && (op === '+' || op === '-' )) {
+            expression = op;
+        } else if (/[-+*/.]$/.test(expression)) {
+            expression = expression.slice(0, -1) + op;
+        } else {
+            expression += op;
         }
-    });
-});
+        updateDisplay();
+    }
 
-// Add active class to navigation links on scroll
-const sections = document.querySelectorAll('section');
-const navLinks = document.querySelectorAll('nav ul li a');
-
-window.addEventListener('scroll', () => {
-    let current = '';
-    
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 60) {
-            current = section.getAttribute('id');
+    function evaluate() {
+        try {
+            // Disallow invalid trailing operators
+            if (/[-+*/.]$/.test(expression)) expression = expression.slice(0, -1);
+            // Evaluate safely
+            // eslint-disable-next-line no-new-func
+            const result = Function(`"use strict"; return (${expression || 0})`)();
+            expression = String(result);
+        } catch (e) {
+            expression = '';
+            alert('Invalid expression');
         }
+        updateDisplay();
+    }
+
+    keys.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLButtonElement)) return;
+        const key = target.getAttribute('data-key');
+        const op = target.getAttribute('data-op');
+        if (key) append(key);
+        if (op) appendOp(op);
     });
 
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-            link.classList.add('active');
-        }
-    });
-});
+    clearBtn.addEventListener('click', () => { expression = ''; updateDisplay(); });
+    equalsBtn.addEventListener('click', evaluate);
 
-// Add animation to skill items
-const skillItems = document.querySelectorAll('.skill-category ul li');
-const observerOptions = {
-    threshold: 0.5
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateX(0)';
-        }
+    document.addEventListener('keydown', (e) => {
+        if (/^[0-9.]$/.test(e.key)) append(e.key);
+        if (['+', '-', '*', '/'].includes(e.key)) appendOp(e.key);
+        if (e.key === 'Enter') evaluate();
+        if (e.key === 'Escape') { expression = ''; updateDisplay(); }
     });
-}, observerOptions);
 
-skillItems.forEach(item => {
-    item.style.opacity = '0';
-    item.style.transform = 'translateX(-20px)';
-    item.style.transition = 'all 0.5s ease-out';
-    observer.observe(item);
-});
+    updateDisplay();
+})();
 
-// Add hover effect to experience items
-const experienceItems = document.querySelectorAll('.experience-item');
-experienceItems.forEach(item => {
-    item.addEventListener('mouseenter', () => {
-        item.style.transform = 'translateX(10px)';
-        item.style.transition = 'transform 0.3s ease';
-    });
-    
-    item.addEventListener('mouseleave', () => {
-        item.style.transform = 'translateX(0)';
-    });
-}); 
+
